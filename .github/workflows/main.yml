@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]  # Замените 'main' на название вашей основной ветки, если оно отличается
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'  # Используйте версию Node.js, которая подходит для вашего проекта
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run linter
+      run: npm run lint  # Убедитесь, что у вас есть скрипт lint в package.json
+
+    - name: Check formatting
+      run: npm run format:check  # Убедитесь, что у вас есть скрипт format:check в package.json
+
+    - name: Build
+      run: npm run build  # Скрипт для сборки вашего проекта
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public  # Укажите папку, в которую выполняется сборка вашего сайта
