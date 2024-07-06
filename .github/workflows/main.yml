@@ -26,7 +26,11 @@ jobs:
         run: |
           npm run build
       - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/checkout@v4
+              actions/setup-node@v4
+              actions/upload-pages-artifact@v3
+              actions/configure-pages@v4
+              actions/deploy-pages@v4
         with:
           
           path: 'build/'
