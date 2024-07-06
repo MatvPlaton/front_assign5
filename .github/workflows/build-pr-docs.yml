@@ -1,0 +1,56 @@
+name: Build docs from a pull request
+on:
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - attractions/**
+      - docs/**
+      - CHANGELOG.md
+      - MIGRATION_GUIDE.md
+      - package.json
+      - pnpm-lock.yaml
+
+jobs:
+  build-docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@6e1964dde3397a825e79e4607ad57f3f7ca2c7cb
+        with:
+          version: ^8.10.2
+
+      - name: Set up Node 20 📦
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Build docs 🔧
+        env:
+          SAPPER_APP_BASEPATH: attractions/${{ github.event.number }}
+        run: |
+          pnpm install
+          pnpm run export --basepath attractions/${{ github.event.number }}
+
+      - name: Save the PR number 📩
+        run: echo "${{ github.event.number }}" > ../pr_number.txt
+        # The ".." is to go outside the docs directory
+
+      - name: Upload the PR number 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt
+
+      - name: Upload the built docs 📤
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs/__sapper__/export/attractions/${{ github.event.number }}/

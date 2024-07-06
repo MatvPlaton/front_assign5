@@ -1,0 +1,73 @@
+name: Post-release chores
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    name: Deploy docs to GitHub Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@6e1964dde3397a825e79e4607ad57f3f7ca2c7cb
+        with:
+          version: ^8.10.2
+
+      - name: Set up Node 20 📦
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Build docs 🔧
+        env:
+          SAPPER_APP_BASEPATH: attractions
+        run: |
+          pnpm install
+          pnpm run export --basepath attractions
+
+      - name: Publish 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/__sapper__/export/attractions/
+          force_orphan: true
+
+  release:
+    name: Release to npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@6e1964dde3397a825e79e4607ad57f3f7ca2c7cb
+        with:
+          version: ^8.10.2
+
+      - name: Set up Node 20 📦
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+
+      - name: Build bundles 🔧
+        run: |
+          cp README.md LICENSE attractions/
+          cd attractions
+          pnpm install
+          pnpm run build
+
+      - name: Release 🚀
+        working-directory: attractions
+        run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,30 @@
+name: Lint a pull request
+on: pull_request
+
+jobs:
+  lint:
+    name: Lint and try building bundles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@6e1964dde3397a825e79e4607ad57f3f7ca2c7cb
+        with:
+          version: ^8.10.2
+
+      - name: Set up Node 20 📦
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies 🧰
+        run: pnpm install
+
+      - name: Lint 🔬
+        run: pnpm run lint
+
+      - name: Build bundles 🔧
+        run: pnpm run build
