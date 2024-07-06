@@ -1,0 +1,2 @@
+<div style="position:relative; top: 50px"> I was born in the small city of Nizhnekamsk. <br> In 2022, I graduated from school in my<br> hometown and <br>
+    was able to enter Innopolis University. </div>
