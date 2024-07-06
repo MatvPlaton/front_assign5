@@ -30,7 +30,11 @@ jobs:
         with:
           
           path: 'build/'
-
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: 'build/'
   deploy:
     needs: build_site
     runs-on: ubuntu-latest
@@ -46,8 +50,6 @@ jobs:
     steps:
       - name: Configure Pages
         uses: actions/configure-pages@v4
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
